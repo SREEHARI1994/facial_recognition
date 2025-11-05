@@ -5,31 +5,37 @@ import mediapipe as mp
 import json
 import os
 from datetime import datetime
+from .models_utils import ensure_model_exists
 
 # --- Configuration ---
 # Optimal threshold for Cosine Similarity with ArcFace.
 # HIGHER value means closer match (0.5 to 0.6 is common).
-RECOGNITION_THRESHOLD = 1.0
+RECOGNITION_THRESHOLD = 0.3
+
 
 
 class SimpleFaceRecognizer:
     def __init__(self, model_path=None, db_path=None):
-        # Model path setup
+        
         if model_path is None:
-            model_path = os.path.join(os.path.dirname(__file__), "arcface.onnx")
-        self.model_path = model_path
+            model_path = ensure_model_exists()
+        self.model_path = model_path  # ✅ assign before using it
         if not os.path.exists(self.model_path):
             raise FileNotFoundError(f"Model file not found: {self.model_path}")
 
         # ONNX Runtime setup
-        self.sess = ort.InferenceSession(self.model_path, providers=["CPUExecutionProvider"])
+        providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+        self.sess = ort.InferenceSession(self.model_path, providers=providers)
         self.input_name = self.sess.get_inputs()[0].name
 
         # Initialize Mediapipe face detector
-        self.detector = mp.solutions.face_detection.FaceDetection(
-            model_selection=1, min_detection_confidence=0.5
-        )
-
+        #self.detector = mp.solutions.face_detection.FaceDetection(
+            #odel_selection=1, min_detection_confidence=0.5
+        #)
+        #self.detector = mp.solutions.face_detection.FaceDetection(
+            #model_selection=0,  # short-range, works better for small faces
+            #min_detection_confidence=0.3
+        #)
         # --- Face database path ---
         if db_path is None:
             db_path = os.path.join(os.path.dirname(__file__), "face_db.json")
@@ -56,8 +62,32 @@ class SimpleFaceRecognizer:
     # ---------- Core methods ----------
 
     def detect_faces(self, image):
-        """Detect faces using Mediapipe and return normalized boxes + confidence."""
-        results = self.detector.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        """Detect faces using Mediapipe with automatic model selection (short vs full range)."""
+
+        # --- 1. Choose the right Mediapipe model ---
+        h, w = image.shape[:2]
+        if max(h, w) < 150:
+            model_selection = 0  # short-range model for small/cropped faces
+            min_conf = 0.3
+        else:
+            model_selection = 1  # full-range model for normal camera photos
+            min_conf = 0.5
+        print(f"[DEBUG] Using Mediapipe model={model_selection} (h={h}, w={w})")
+
+        # --- 2. Initialize detectors lazily (and cache them) ---
+        if not hasattr(self, "_detectors"):
+            self._detectors = {}
+
+        if model_selection not in self._detectors:
+            self._detectors[model_selection] = mp.solutions.face_detection.FaceDetection(
+                model_selection=model_selection,
+                min_detection_confidence=min_conf
+            )
+
+        detector = self._detectors[model_selection]
+
+        # --- 3. Run detection ---
+        results = detector.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         detections = []
         if not results.detections:
             return detections
@@ -70,9 +100,10 @@ class SimpleFaceRecognizer:
                 "confidence": conf
             })
 
-        # Filter low-confidence detections
-        detections = [d for d in detections if d["confidence"] > 0.8]
+        # --- 4. Filter weak detections ---
+        detections = [d for d in detections if d["confidence"] > min_conf]
         return detections
+
 
     def embed(self, face_crop):
         """Generate normalized embedding for cropped face."""
@@ -126,11 +157,26 @@ class SimpleFaceRecognizer:
 
     # ---------- Face Registration ----------
 
-    def add_person(self, name, image_path):
+    def add_person(self, name, image):
         """Add a new person to the known faces database."""
-        detections = self.recognize_file(image_path, return_embeddings=True, save_output=False)
+        if isinstance(image, str):
+            img = cv2.imread(image)
+            if img is None:
+                print(f"[WARN] Could not read {image}")
+                return
+        elif isinstance(image, np.ndarray):
+            img = image
+        else:
+            raise ValueError("`image` must be a file path (str) or a NumPy array.")
+
+        # Convert grayscale → BGR if needed
+        #if len(img.shape) == 2:
+            #img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        detections = self.recognize_image(img, return_embeddings=True, save_output=False)
         if not detections:
-            print(f"[WARN] No face found in {image_path}")
+            print(f"[WARN] No face found (image shape={img.shape})")
+
+
             return
 
         emb = detections[0]["embedding"]
@@ -138,11 +184,22 @@ class SimpleFaceRecognizer:
         self.save_database()
         print(f"[INFO] Added {name} to database")
 
-    def recognize_file(self, image_path, threshold=RECOGNITION_THRESHOLD, save_output=True, return_embeddings=False):
+    
+    
+    def recognize_image(self, input_image, threshold=RECOGNITION_THRESHOLD, save_output=True, return_embeddings=False):
         """Detect faces, recognize them, draw boxes, and optionally save annotated image."""
-        image = cv2.imread(image_path)
-        if image is None:
-            raise FileNotFoundError(f"Could not read image: {image_path}")
+        # Determine if `image` is a file path or an image array
+        if isinstance(input_image, str):
+            if not os.path.exists(input_image):
+                raise FileNotFoundError(f"Image file not found: {input_image}")
+            image = cv2.imread(input_image)
+            if image is None:
+                raise ValueError(f"Unable to read image file: {input_image}")
+            
+        elif isinstance(input_image, np.ndarray):
+            image = input_image
+        else:
+            raise TypeError("Input must be either a NumPy array or a valid image file path.")
 
         faces = self.detect_faces(image)
         results = []
@@ -182,9 +239,12 @@ class SimpleFaceRecognizer:
             out_path = os.path.join("output", f"recognized_{ts}.jpg")
             cv2.imwrite(out_path, image)
             print(f"[INFO] Saved annotated image to {out_path}")
-
+            
         return results
-
+    
+    
+    
+    '''
     def visualize_detections(self, image_path, detections, save_to="debug_faces.jpg"):
         """Draw bounding boxes for detected faces."""
         img = cv2.imread(image_path)
@@ -213,3 +273,5 @@ class SimpleFaceRecognizer:
 
         cv2.imwrite(save_to, img)
         print(f"Saved visualization to {save_to}")
+
+    '''
