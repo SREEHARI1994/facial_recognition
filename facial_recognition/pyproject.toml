@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "facial_recognition"
+version = "0.0.5"
+authors = [
+  { name="Sreehari P V", email="rubarion@gmail.com" },
+]
+
+description = "Most effective and easiest to install python library for recognising faces in images or videos"
+readme = "README.md"
+requires-python = ">=3"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+# 👇 This allows you to run from command line directly
+[project.scripts]
+facial_recognition = "facial_recognition.cli:main"
+facial_recognition-setup = "facial_recognition.setup_model:main"
+
+[tool.hatch.build]
+sources = ["src"] 
+
+[project.urls]
+Homepage = "https://github.com/Rubarion/facial_recognition"
