@@ -6,7 +6,7 @@
 ```
 pip install facial_recognition
 ```
-After that, you need to download and setup the model file used for recognition by running the following command (Even if you dont do this now, the model file will be downloaded the first time you run this library)
+After that, you need to download and setup the model file used for recognition by running the following command (Even if you don't do this now, the model file will be downloaded the first time you run this library)
 
 
 
@@ -21,7 +21,7 @@ In case this results in an error, you need to manually download the model file t
 Invoke-WebRequest https://huggingface.co/Rubarion/facial_recognition_model/resolve/main/arcface.onnx -OutFile arcface.onnx
 ```
 
-(The model file is a single file of around 130Mb in size. Currently this has to be downloaded serparately as pypi has a limit of 100Mb for the total pacakage size. If and when pypi allows me to bundle the model file along with the code, you only need to run `pip install facial_recognition`)
+(The model file is a single file of around 130Mb in size. Currently this has to be downloaded serparately as pypi has a limit of 100Mb for the total pacakage size. If and when pypi allows me to bundle the model file along with the code, you will only need to run `pip install facial_recognition`)
 
 
 **Works the same on all Operating systems be it Windows,Linux or Mac and also installs the same on all**
@@ -138,7 +138,7 @@ recognize_image("test.png")
 ```
 
 
-This recognize_image function also returns a results python dictionary as defined below that has the keys name,score, confidence, box, embedding. You can use these to do further processing of your recognised image.Please not that inorder to get embeddings you need to set the argument as `return_embeddings=True` while calling the function as in `recognize_image("test.png",return_embeddings=True)`
+This recognize_image function also returns a results python dictionary as defined below that has the keys name,score, confidence, box, embedding. You can use these to do further processing of your recognised image. Please note that inorder to get embeddings, you need to set the argument as `return_embeddings=True` while calling the function as in `recognize_image("test.png",return_embeddings=True)`
 
 ```python
 results = {
@@ -175,10 +175,8 @@ As an example, if you wish to get your own face recognised from your webcam, you
 
 ```python
 import cv2
-from facial_recognition import SimpleFaceRecognizer
+from facial_recognition import recognize_image
 
-# Initialize recognizer (loads model + known faces)
-recognizer = SimpleFaceRecognizer()
 
 # Start webcam
 cap = cv2.VideoCapture(0)
@@ -196,7 +194,7 @@ while True:
         break
 
     # Run face recognition (don't save output each frame)
-    results = recognizer.recognize_image(frame, save_output=False)
+    results = recognize_image(frame, save_output=False)
 
     # Draw results on frame
     for r in results:
@@ -221,6 +219,7 @@ while True:
 cap.release()
 cv2.destroyAllWindows()
 print("[INFO] Webcam recognition stopped.")
+
 ```
 
 Testing my webcam feed using this photo of mine
@@ -231,10 +230,17 @@ Testing my webcam feed using this photo of mine
 *Input*
 
 
-![Output1](facial_recognition/tests/tomleonard/output/mywebcam "Output image")
+![Output1](facial_recognition/tests/tomleonard/output/mywebcam.png "Output image")
 
 
 *Output Video Feed*
+
+As you can see, even though my input photo was taken two years back and even though currently my hairstyle(short hair) is drastically different from the input photo and also despite the very low clarity of my web cam feed, this python package correctly recognised me.
+
+
+
+You can also optionally pass the threshold argument while calling recognize_image function and try tweaking its value between 0(very lenient face identification) to 1 (very strict) to try to improve accuarcy for your use case as in `recognize_image("test.png",threshold=0.4)`
+
 
 
 # Testing and Accuracy
@@ -245,7 +251,7 @@ This package was tested on the **[Labelled Faces in the Wild (LFW Dataset)](http
 
 ![Test in progress](facial_recognition/tests/accuracy/two.png "Test Result")
 
-Why accuarcy is not close to 100% is because the images in this dataset are very small cropped faces as shown in the output images below (where the facial_recognition package correctly recognised Angelina Jolie and Catherine Zeta Jones) and as we are very unlikely to encounter such small cropped close up shots of face images or frames in the real world, it was not worth the effort to tweak the code to obtain >90% accuracy just for this dataset. Basically this test proves that both fo normal images of persons as well as for very small images like this, the package does very very well in correctly identifying the faces.
+Why accuarcy is not close to 100% is because the images in this dataset are very small cropped faces as shown in the output images below (where the facial_recognition package correctly recognised Angelina Jolie and Catherine Zeta Jones) and as we are very unlikely to encounter such small cropped close up shots of face images or frames in the real world, it was not worth the effort to tweak the code to obtain >90% accuracy just for this dataset. Basically this test proves that both for normal images of persons as well as for very small images like this, the package does very very well in correctly identifying the faces.
 
 ![Output Images](facial_recognition/tests/accuracy/four.jpg "Angelina Jolie")
 
