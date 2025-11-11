@@ -2,6 +2,27 @@
 **facial_recognition** aims to be the most effective face recognition [library](https://pypi.org/project/facial-recognition/) for python that you can install with a single command
 
 
+# Demo -Below you can see facial_recognition correctly recognizing actors Tom Cruise and Leonardo DiCaprio amongst a group of other people from just a single photo of them
+
+
+
+![Input1](facial_recognition/tests/tomleonard/leonardo.png "A recent photo of actor Leonardo Dicaprio")
+
+![Input2](facial_recognition/tests/tomleonard/tom.jpg "A relatively recent photo of actor Tom Cruise")
+
+*Images stored as known faces*
+
+
+
+![Output1](facial_recognition/tests/tomleonard/output/recognized_20251110_050331.jpg "Output image")
+
+*Output image with all the faces identified and labelled correctly*
+
+
+
+
+# Installation
+
 
 ```
 pip install facial_recognition
@@ -11,7 +32,7 @@ After that, you need to download and setup the model file used for recognition b
 
 
 ```
-facial_recognition-setup
+facial_recognition setup
 ```
 
 In case this results in an error, you need to manually download the model file to the path where facial_recognition is installed( Usually on Windows its in C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\facial_recognition) using wget on Linux and Invoke-WebRequest on Windows
@@ -21,10 +42,19 @@ In case this results in an error, you need to manually download the model file t
 Invoke-WebRequest https://huggingface.co/Rubarion/facial_recognition_model/resolve/main/arcface.onnx -OutFile arcface.onnx
 ```
 
+Or visit https://huggingface.co/Rubarion/facial_recognition_model/tree/main and just download and save the arcface.onnx file to the correct folder
+
 (The model file is a single file of around 130Mb in size. Currently this has to be downloaded serparately as pypi has a limit of 100Mb for the total pacakage size. If and when pypi allows me to bundle the model file along with the code, you will only need to run `pip install facial_recognition`)
 
 
 **Works the same on all Operating systems be it Windows,Linux or Mac and also installs the same on all**
+
+
+**Works the same on CPU and GPUs. Instantaneous face recognition on simple CPUs**
+
+
+
+# Usage as a command line tool (scroll down for how to use in programs)
 
 
 **Adding Known faces to the database**
@@ -66,21 +96,6 @@ facial_recognition remove_faces
 
 
 
-# Demo -Below you can see facial_recognition correctly recognizing actors Tom Cruise and Leonardo DiCaprio amongst a group of other people from just a single photo of them
-
-
-
-![Input1](facial_recognition/tests/tomleonard/leonardo.png "A recent photo of actor Leonardo Dicaprio")
-
-![Input2](facial_recognition/tests/tomleonard/tom.jpg "A relatively recent photo of actor Tom Cruise")
-
-*Images stored as known faces*
-
-
-
-![Output1](facial_recognition/tests/tomleonard/output/recognized_20251110_050331.jpg "Output image")
-
-*Output image with all the faces identified and labelled correctly*
 
 
 
@@ -138,7 +153,7 @@ recognize_image("test.png")
 ```
 
 
-This recognize_image function also returns a results python dictionary as defined below that has the keys name,score, confidence, box, embedding. You can use these to do further processing of your recognised image. Please note that inorder to get embeddings, you need to set the argument as `return_embeddings=True` while calling the function as in `recognize_image("test.png",return_embeddings=True)`
+This recognize_image function also returns a results python dictionary as defined below that has the keys name,score, confidence, box and optionally embedding. You can use these to do further processing of your recognised image. Please note that inorder to get embeddings, you need to set the argument as `return_embeddings=True` while calling the function as in `recognize_image("test.png",return_embeddings=True)`
 
 ```python
 results = {
@@ -239,7 +254,8 @@ As you can see, even though my input photo was taken two years back and even tho
 
 
 
-You can also optionally pass the threshold argument while calling recognize_image function and try tweaking its value between 0(very lenient face identification) to 1 (very strict) to try to improve accuarcy for your use case as in `recognize_image("test.png",threshold=0.4)`
+You can also optionally pass the threshold argument while calling recognize_image function and try tweaking its value between 0(very lenient face identification//more false positives) to 1 (very strict) to try to improve accuarcy for your use case as in `recognize_image("test.png",threshold=0.4)`.When you run without the argument, the default fixed as 0.3 will be used. The other argument to this recognize_image fucntion is
+save_output and so you can set `recognize_image("test1.jpg",save_output=False)` to avoid generating an output image and saving it in the output folder.
 
 
 

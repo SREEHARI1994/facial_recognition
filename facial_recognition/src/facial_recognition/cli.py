@@ -3,6 +3,7 @@ import os
 from .recognizer import SimpleFaceRecognizer
 from .add_faces import add_faces_from_folder
 from .remove_faces import remove_face_database
+from .setup_model import main as setup_model_main
 
 
 def main():
@@ -54,6 +55,9 @@ def main():
         return
 
     # --- Handle commands ---
+    if args.command == "setup":
+        setup_model_main()  # ✅ Calls your setup_model.py:main()
+
     if args.command == "add_faces":
         folder = os.getcwd()
         add_faces_from_folder(folder)
