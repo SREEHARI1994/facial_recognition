@@ -1,7 +1,7 @@
 import os
 import urllib.request
 
-MODEL_URL = "https://huggingface.co/yourusername/simpleface-models/resolve/main/arcface.onnx"
+MODEL_URL = "https://huggingface.co/Rubarion/facial_recognition_model/resolve/main/arcface.onnx?download=true"
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "arcface.onnx")
 
 def ensure_model_exists():
