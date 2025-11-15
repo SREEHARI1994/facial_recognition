@@ -1,5 +1,5 @@
 # facial_recognition
-**facial_recognition** aims to be the most effective face recognition [library](https://pypi.org/project/facial-recognition/) for python that you can install with a single command
+**facial_recognition** aims to be the most effective face recognition [library](https://pypi.org/project/facial-recognition/) for python that you can install with a single command.
 
 
 # Demo -Below you can see facial_recognition correctly recognizing actors Tom Cruise and Leonardo DiCaprio amongst a group of other people from just a single photo of them
@@ -25,10 +25,11 @@
 
 ## 🚀 Unique Features  
 
-✅ **Works the same on all Operating systems be it Windows,Linux or Mac and also installs the same on all** 
-✅ **Works the same on CPU and GPUs. Instantaneous face recognition on simple CPUs** 
-✅ **Works on its own and doesn't require the installation of any other libraries** 
-✅ **Images can be passed as either files or as arrays and therefore very easy to use on existing large         databases of images of people**
+✅ **Works the same on all Operating systems be it Windows,Linux or Mac and also installs the same on all**
+✅ **Has the highest possible accuracy of 86.17% on the massive CelebA dataset**   
+✅ **Works the same on CPU and GPUs. Instantaneous face recognition on simple CPUs**   
+✅ **Works on its own and doesn't require the installation of any other libraries**   
+✅ **Images can be passed as either files or as arrays and therefore very easy to use on existing large         databases of images of people**  
 
 ---
 
@@ -40,7 +41,7 @@
 ```
 pip install facial_recognition
 ```
-After that, you need to download and setup the model file used for recognition by running the following command (Even if you don't do this now, the model file will be downloaded the first time you run this library)
+After that, you need to download and setup the model file used for recognition by running the following command **(Even if you don't do this now, the model file will be downloaded the first time you run this library)**
 
 
 
@@ -271,6 +272,19 @@ save_output and so you can set `recognize_image("test1.jpg",save_output=False)` 
 
 
 # Testing and Accuracy
+
+This package was tested on the very popular **[CelebA dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and the highest possible accuracy of 86.17% or 165807 faces correctly recognized out of total 192422 was obtained.**(Screenshot of test running in terminal attached below). Code used for testing is given [here](https://github.com/Rubarion/facial_recognition/blob/facial_recognition/tests/testingScriptCelebA_threaded.py)
+
+![Test Results](facial_recognition/tests/accuracy/celeb1.png "Testing on just CPU")
+
+Testing done On Visual Studio Code Using just CPU
+
+In case you are wondering why the accuracy is not close to 100% or even above 90%, an explanation of the same is given [here](https://github.com/Rubarion/facial_recognition/blob/facial_recognition/tests/accuracy/accuracyExplanation.md) as answered by ChatGPT.
+
+
+
+
+
 
 This package was tested on the **[Labelled Faces in the Wild (LFW Dataset)](https://www.kaggle.com/datasets/jessicali9530/lfw-dataset?utm_source=chatgpt.com) and a very impressive 74.65% accuracy or 969 faces recognised correctly out of total 1298 was obtained.** (Screenshots of test running in terminal attached below)
 
