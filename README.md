@@ -25,12 +25,12 @@
 
 ## 🚀 Unique Features  
 
---✅ **Works the same on all Operating systems be it Windows,Linux or Mac and also installs the same on all**  
---✅ **Has the highest possible accuracy of 99.59% on the labelled faces in the wild dataset**
---✅ **Has the max possible accuracy of 86.17% on the massive CelebA dataset**   
---✅ **Works the same on CPUs and GPUs. Instantaneous face recognition on simple CPUs**   
---✅ **Works on its own and doesn't require the installation of any other libraries like dlib**   
---✅ **Images can be passed as either files or as arrays and therefore very easy to use on existing large         databases of images of people**  
+- ✅ **Works the same on all Operating systems be it Windows,Linux or Mac and also installs the same on all**  
+- ✅ **Has the highest possible accuracy of 99.59% on the labelled faces in the wild dataset**
+- ✅ **Has the max possible accuracy of 86.17% on the massive CelebA dataset**   
+- ✅ **Works the same on CPUs and GPUs. Instantaneous face recognition on simple CPUs**   
+- ✅ **Works on its own and doesn't require the installation of any other libraries like dlib**   
+- ✅ **Images can be passed as either files or as arrays and therefore very easy to use on existing large         databases of images of people**  
 
 ---
 
